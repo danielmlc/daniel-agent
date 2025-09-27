@@ -1,7 +1,10 @@
 # main.py
 import asyncio
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from contextlib import asynccontextmanager
 
 from core.orchestrator import PersonalButler
@@ -9,7 +12,16 @@ from core.config import load_config
 from core.security import SecurityManager
 # from core.health import SystemHealthMonitor # To be implemented in a later phase
 
-# Configure basic logging
+# --- Web UI Configuration ---
+app = FastAPI(
+    title="Personal AI Assistant",
+    description="智能个人助理系统",
+    version="2.0.0",
+)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+# --- Logging Configuration ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -52,16 +64,19 @@ async def lifespan(app: FastAPI):
     await personal_butler.shutdown()
     await health_monitor.shutdown()
 
-app = FastAPI(
-    title="Personal AI Assistant",
-    description="智能个人助理系统",
-    version="2.0.0",
-    lifespan=lifespan
-)
+# Re-assign the lifespan to the app instance
+app.router.lifespan_context = lifespan
 
-@app.get("/")
-async def root():
-    return {"message": "Personal AI Assistant is running."}
+@app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    # The root now redirects to the dashboard
+    return templates.TemplateResponse("redirect.html", {"request": request})
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request):
+    """Serves the main dashboard page."""
+    # We can pass data to the template here in the future
+    return templates.TemplateResponse("dashboard.html", {"request": request, "page_title": "Dashboard"})
 
 # This check is for when you run the script directly, e.g., for debugging.
 # The standard way to run a FastAPI app is with `uvicorn main:app`.
