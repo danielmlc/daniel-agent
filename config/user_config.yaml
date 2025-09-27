@@ -1,0 +1,106 @@
+# config/user_config.yaml
+user:
+  name: "Default User"
+  timezone: "Asia/Shanghai"
+  language: "zh-CN"
+
+  preferences:
+    working_hours:
+      start: 9
+      end: 18
+      days: [1, 2, 3, 4, 5]  # 周一到周五
+
+    notification_settings:
+      quiet_hours:
+        start: 22
+        end: 7
+      urgency_threshold: "normal"
+      preferred_channels: ["push", "email"]
+
+    content_priorities:
+      work: 1.0
+      health: 0.8
+      personal: 0.6
+      news: 0.4
+
+agents:
+  personal_butler:
+    enabled: true
+    schedule: "0 8,12,18 * * *"  # 每天8点、12点、18点
+    report_types: ["daily", "weekly"]
+
+  github_assistant:
+    enabled: true
+    schedule: "0 9 * * *"  # 每天9点
+    repositories:
+      - "testuser/test-repo1"
+      - "testuser/test-repo2"
+    analysis_depth: "detailed"
+    github_token: "YOUR_GITHUB_TOKEN_HERE" # Placeholder
+
+  email_processor:
+    enabled: true
+    schedule: "*/30 * * * *"  # 每30分钟
+    email_accounts:
+      - provider: "gmail"
+        filters:
+          important_senders: ["boss@company.com", "team@company.com"]
+          spam_keywords: ["promotion", "advertisement"]
+
+  health_advisor:
+    enabled: false # Disabled by default
+    schedule: "0 7,19 * * *"  # 每天7点和19点
+    data_sources:
+      - type: "apple_health"
+        metrics: ["steps", "sleep", "heart_rate"]
+      - type: "fitbit"
+        sync_frequency: "hourly"
+
+  task_planner:
+    enabled: false # Disabled by default
+    schedule: "0 8 * * *"  # 每天8点
+    calendar_integration: true
+    priority_algorithm: "eisenhower_matrix"
+
+  info_analyst:
+    enabled: false # Disabled by default
+    schedule: "0 10 * * *"  # 每天10点
+    sources:
+      - type: "rss"
+        url: "https://feeds.example.com/tech"
+        category: "technology"
+      - type: "website"
+        url: "https://example.com/news"
+        selector: ".news-item"
+
+security:
+  encryption:
+    enabled: true
+    key_rotation_days: 90
+    # A default key will be generated if not provided
+    encryption_key: ""
+
+  backup:
+    enabled: true
+    frequency: "daily"
+    retention_days: 30
+    encrypted: true
+
+  access_control:
+    session_timeout: 3600  # 1小时
+    max_failed_attempts: 3
+    lockout_duration: 300  # 5分钟
+
+monitoring:
+  health_check_interval: 300  # 5分钟
+  metrics_retention_days: 90
+  log_level: "INFO"
+
+  alerts:
+    email_notifications: false
+    webhook_url: ""
+
+  performance_thresholds:
+    response_time_ms: 5000
+    success_rate_percent: 80
+    error_rate_percent: 10
